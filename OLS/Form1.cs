@@ -25,6 +25,9 @@ namespace OLS
         public List<PointD> newpoints = new List<PointD>();
         LSM lsm2 = new LSM();
         LSM lsm3 = new LSM();
+        Lab2 lab2cl = new Lab2();
+        bool lab1 = true;
+        bool lab2 = false;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -38,6 +41,14 @@ namespace OLS
             dataGridView1.Columns.Add("x", "X");
             dataGridView1.Columns.Add("y", "Y");
             chart1.MouseWheel += chart1_MouseWheel;
+
+            lab1 = false;
+            lab2 = true;
+            LSM2checkBox.Text = "PL";
+            LSM3checkBox.Text = "Lagrange";
+
+
+
         }
         
 
@@ -262,22 +273,45 @@ namespace OLS
         {
             chart1.Series["LineSeries1"].Points.Clear();
             chart1.Series["LineSeries2"].Points.Clear();
-            lsm2.FillTheMatrix2(newpoints);
-            lsm3.FillTheMatrix3(newpoints);
-            if (LSM2checkBox.Checked)
+            if (lab1)
             {
-                for (double i = newpoints[0].X - 1; i < newpoints[newpoints.Count - 1].X + 1; i++)
+                lsm2.FillTheMatrix2(newpoints);
+                lsm3.FillTheMatrix3(newpoints);
+                if (LSM2checkBox.Checked)
                 {
-                    chart1.Series["LineSeries1"].Points.AddXY(i, lsm2.C0 + lsm2.C1 * i);
+                    for (double i = newpoints[0].X - 1; i < newpoints[newpoints.Count - 1].X + 1; i++)
+                    {
+                        chart1.Series["LineSeries1"].Points.AddXY(i, lsm2.C0 + lsm2.C1 * i);
+                    }
+                }
+                if (LSM3checkBox.Checked)
+                {
+                    for (double i = newpoints[0].X - 1; i < newpoints[newpoints.Count - 1].X + 1; i++)
+                    {
+                        chart1.Series["LineSeries2"].Points.AddXY(i, lsm3.C0 + lsm3.C1 * i + lsm3.C2 * i * i);
+                    }
                 }
             }
-            if (LSM3checkBox.Checked)
+            else
             {
-                for (double i = newpoints[0].X - 1; i < newpoints[newpoints.Count - 1].X + 1; i++)
+                List<double> xValues = newpoints.Select(obj => obj.X).ToList();
+                List<double> yValues = newpoints.Select(obj => obj.Y).ToList();
+                if (LSM2checkBox.Checked)//PL
                 {
-                    chart1.Series["LineSeries2"].Points.AddXY(i, lsm3.C0 + lsm3.C1 * i + lsm3.C2 * i * i);
+                    for (double i = newpoints[0].X; i <= newpoints[newpoints.Count-1].X; i++)
+                    {
+                        chart1.Series["LineSeries1"].Points.AddXY(i, lab2cl.GetYPL(i,xValues,yValues));
+                    }
+                }
+                if (LSM3checkBox.Checked)//Lagrange
+                {
+                    for (double i = newpoints[0].X; i <= newpoints[newpoints.Count-1].X; i++)
+                    {
+                        chart1.Series["LineSeries2"].Points.AddXY(i, lab2cl.InterpolateLagrangePolynomial(i, xValues, yValues, xValues.Count));
+                    }
                 }
             }
+            
 
         }
 
@@ -333,19 +367,43 @@ namespace OLS
             {
                 double x = Convert.ToDouble(XTextBox.Text);
                 YText = "For x = " + XTextBox.Text + "\n";
-                if (LSM2checkBox.Checked)
+
+                if (lab1)
                 {
-                    YText += "LSM 2 y value = " + (lsm2.C0 + lsm2.C1 * x) + "\n";
+                    if (LSM2checkBox.Checked)
+                    {
+                        YText += "LSM 2 y value = " + (lsm2.C0 + lsm2.C1 * x) + "\n";
+                    }
+                    if (LSM3checkBox.Checked)
+                    {
+                        YText += "LSM 3 y value = " + (lsm3.C0 + lsm3.C1 * x + lsm3.C2 * x * x) + "\n";
+                    }
                 }
-                if (LSM3checkBox.Checked)
+                else if (lab2)
                 {
-                    YText += "LSM 3 y value = " + (lsm3.C0 + lsm3.C1 * x + lsm3.C2 * x * x) + "\n";
+                    List<double> xValues = newpoints.Select(obj => obj.X).ToList();
+                    List<double> yValues = newpoints.Select(obj => obj.Y).ToList();
+                    if (x < xValues[0] || x > xValues[xValues.Count - 1])
+                    {
+                        MessageBox.Show("Wrong X Value");
+                    }
+                    else
+                    {
+                        if (LSM2checkBox.Checked)
+                        {
+                            YText += "PL y value = " + (lab2cl.GetYPL(x, xValues, yValues)) + "\n";
+                        }
+                        if (LSM3checkBox.Checked)
+                        {
+                            YText += "Lagrange y value = " + (lab2cl.InterpolateLagrangePolynomial(x, xValues, yValues, xValues.Count)) + "\n";
+                        }
+                    }
                 }
                 MessageBox.Show(YText);
             }
             else
             {
-                MessageBox.Show("Wrond X Value");
+                MessageBox.Show("Wrong X Value");
             }
         }
 
@@ -372,13 +430,27 @@ namespace OLS
             try
             {
                 string text = "";
-                if(LSM2checkBox.Checked)
+                if (lab1)
                 {
-                    text += "Coefficients for LSM2 are:\nC0 = " + lsm2.C0 + "\nC1 = " + lsm2.C1 + "\n";
+                    if (LSM2checkBox.Checked)
+                    {
+                        text += "Coefficients for LSM2 are:\nC0 = " + lsm2.C0 + "\nC1 = " + lsm2.C1 + "\n";
+                    }
+                    if (LSM3checkBox.Checked)
+                    {
+                        text += "Coefficients for LSM3 are:\nC0 = " + lsm3.C0 + "\nC1 = " + lsm3.C1 + "\nC2 = " + lsm3.C2;
+                    }
                 }
-                if (LSM3checkBox.Checked)
+                else if (lab2)
                 {
-                    text += "Coefficients for LSM3 are:\nC0 = " + lsm3.C0 + "\nC1 = " + lsm3.C1 + "\nC2 = " + lsm3.C2;
+                    if (LSM2checkBox.Checked)
+                    {
+                        text += "Coefficients for LSM2 are:\nC0 = "  + "\nC1 = "  + "\n";
+                    }
+                    if (LSM3checkBox.Checked)
+                    {
+                        text += "Coefficients for LSM3 are:\nC0 = "  + "\nC1 = "  + "\nC2 = " + lsm3.C2;
+                    }
                 }
                 MessageBox.Show(text);
             }catch(Exception er)
