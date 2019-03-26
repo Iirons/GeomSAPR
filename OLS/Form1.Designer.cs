@@ -28,12 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.DeletePointButton = new System.Windows.Forms.Button();
             this.GetCoefButton = new System.Windows.Forms.Button();
             this.GetYButton = new System.Windows.Forms.Button();
             this.XTextBox = new System.Windows.Forms.TextBox();
@@ -47,7 +49,9 @@
             this.DrawButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.DeletePointButton = new System.Windows.Forms.Button();
+            this.GaussCheckBox = new System.Windows.Forms.CheckBox();
+            this.GaussParCheckBox = new System.Windows.Forms.CheckBox();
+            this.GaussSumCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -67,6 +71,9 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.GaussSumCheckBox);
+            this.splitContainer1.Panel1.Controls.Add(this.GaussParCheckBox);
+            this.splitContainer1.Panel1.Controls.Add(this.GaussCheckBox);
             this.splitContainer1.Panel1.Controls.Add(this.DeletePointButton);
             this.splitContainer1.Panel1.Controls.Add(this.GetCoefButton);
             this.splitContainer1.Panel1.Controls.Add(this.GetYButton);
@@ -86,6 +93,16 @@
             this.splitContainer1.Size = new System.Drawing.Size(1370, 703);
             this.splitContainer1.SplitterDistance = 250;
             this.splitContainer1.TabIndex = 1;
+            // 
+            // DeletePointButton
+            // 
+            this.DeletePointButton.Location = new System.Drawing.Point(4, 640);
+            this.DeletePointButton.Name = "DeletePointButton";
+            this.DeletePointButton.Size = new System.Drawing.Size(243, 23);
+            this.DeletePointButton.TabIndex = 12;
+            this.DeletePointButton.Text = "Delete Points";
+            this.DeletePointButton.UseVisualStyleBackColor = true;
+            this.DeletePointButton.Click += new System.EventHandler(this.DeletePointButton_Click);
             // 
             // GetCoefButton
             // 
@@ -202,33 +219,38 @@
             // 
             // chart1
             // 
-            chartArea2.CursorX.LineColor = System.Drawing.Color.Transparent;
-            chartArea2.CursorY.LineColor = System.Drawing.Color.Transparent;
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
+            chartArea1.CursorX.LineColor = System.Drawing.Color.Transparent;
+            chartArea1.CursorY.LineColor = System.Drawing.Color.Transparent;
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.chart1.Legends.Add(legend2);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(0, 0);
             this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series1.Legend = "Legend1";
+            series1.Name = "PointSeries";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Color = System.Drawing.Color.Red;
+            series2.Legend = "Legend1";
+            series2.MarkerColor = System.Drawing.Color.White;
+            series2.Name = "LineSeries1";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Color = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            series3.Legend = "Legend1";
+            series3.Name = "LineSeries2";
             series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series4.Legend = "Legend1";
-            series4.Name = "PointSeries";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series5.Color = System.Drawing.Color.Red;
-            series5.Legend = "Legend1";
-            series5.MarkerColor = System.Drawing.Color.White;
-            series5.Name = "LineSeries1";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series6.Color = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            series6.Legend = "Legend1";
-            series6.Name = "LineSeries2";
+            series4.Name = "LineSeries3";
+            this.chart1.Series.Add(series1);
+            this.chart1.Series.Add(series2);
+            this.chart1.Series.Add(series3);
             this.chart1.Series.Add(series4);
-            this.chart1.Series.Add(series5);
-            this.chart1.Series.Add(series6);
             this.chart1.Size = new System.Drawing.Size(1116, 703);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -236,15 +258,35 @@
             this.chart1.MouseEnter += new System.EventHandler(this.Chart1_MouseEnter);
             this.chart1.MouseLeave += new System.EventHandler(this.Chart1_MouseLeave);
             // 
-            // DeletePointButton
+            // GaussCheckBox
             // 
-            this.DeletePointButton.Location = new System.Drawing.Point(4, 640);
-            this.DeletePointButton.Name = "DeletePointButton";
-            this.DeletePointButton.Size = new System.Drawing.Size(243, 23);
-            this.DeletePointButton.TabIndex = 12;
-            this.DeletePointButton.Text = "Delete Points";
-            this.DeletePointButton.UseVisualStyleBackColor = true;
-            this.DeletePointButton.Click += new System.EventHandler(this.DeletePointButton_Click);
+            this.GaussCheckBox.AutoSize = true;
+            this.GaussCheckBox.Location = new System.Drawing.Point(12, 449);
+            this.GaussCheckBox.Name = "GaussCheckBox";
+            this.GaussCheckBox.Size = new System.Drawing.Size(56, 17);
+            this.GaussCheckBox.TabIndex = 13;
+            this.GaussCheckBox.Text = "Gauss";
+            this.GaussCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // GaussParCheckBox
+            // 
+            this.GaussParCheckBox.AutoSize = true;
+            this.GaussParCheckBox.Location = new System.Drawing.Point(74, 449);
+            this.GaussParCheckBox.Name = "GaussParCheckBox";
+            this.GaussParCheckBox.Size = new System.Drawing.Size(72, 17);
+            this.GaussParCheckBox.TabIndex = 14;
+            this.GaussParCheckBox.Text = "GaussPar";
+            this.GaussParCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // GaussSumCheckBox
+            // 
+            this.GaussSumCheckBox.AutoSize = true;
+            this.GaussSumCheckBox.Location = new System.Drawing.Point(152, 449);
+            this.GaussSumCheckBox.Name = "GaussSumCheckBox";
+            this.GaussSumCheckBox.Size = new System.Drawing.Size(77, 17);
+            this.GaussSumCheckBox.TabIndex = 15;
+            this.GaussSumCheckBox.Text = "GaussSum";
+            this.GaussSumCheckBox.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -284,6 +326,9 @@
         private System.Windows.Forms.TextBox XTextBox;
         private System.Windows.Forms.Button GetCoefButton;
         private System.Windows.Forms.Button DeletePointButton;
+        private System.Windows.Forms.CheckBox GaussSumCheckBox;
+        private System.Windows.Forms.CheckBox GaussParCheckBox;
+        private System.Windows.Forms.CheckBox GaussCheckBox;
     }
 }
 

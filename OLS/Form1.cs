@@ -26,8 +26,10 @@ namespace OLS
         LSM lsm2 = new LSM();
         LSM lsm3 = new LSM();
         Lab2 lab2cl = new Lab2();
+        Gauss gauss = new Gauss();
         bool lab1 = true;
         bool lab2 = false;
+        bool lab3 = false;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -42,15 +44,21 @@ namespace OLS
             dataGridView1.Columns.Add("y", "Y");
             chart1.MouseWheel += chart1_MouseWheel;
 
+            //lab2
+            //lab1 = false;
+            //lab2 = true;
+            //LSM2checkBox.Text = "PL";
+            //LSM3checkBox.Text = "Lagrange";
+            //GetCoefButton.Visible = false;
+
+            //lab3
             lab1 = false;
-            lab2 = true;
-            LSM2checkBox.Text = "PL";
-            LSM3checkBox.Text = "Lagrange";
-
-
-
+            lab3 = true;
+            LSM2checkBox.Visible = false;
+            LSM3checkBox.Visible = false;
+            GetCoefButton.Visible = false;
         }
-        
+
 
         private void DrawButton_Click(object sender, EventArgs e)
         {
@@ -60,7 +68,8 @@ namespace OLS
                 dataGridView1.Rows.Clear();
                 int i = 0;
                 newpoints = newpoints.OrderBy(v => v.X).ToList();
-                foreach (var p in newpoints){
+                foreach (var p in newpoints)
+                {
                     dataGridView1.Rows.Add();
                     dataGridView1[0, i].Value = newpoints[i].X;
                     dataGridView1[1, i].Value = newpoints[i].Y;
@@ -104,14 +113,15 @@ namespace OLS
             {
                 double x1 = pos.X, y1 = pos.Y;
                 double x2 = newpoints[0].X, y2 = newpoints[0].Y;
-                double jdist = Math.Sqrt(((x1-x2)* (x1 - x2) + (y1-y2)* (y1 - y2)));
-                int j =0; // index to delete
-                for(int k =1; k< newpoints.Count; k++)
+                double jdist = Math.Sqrt(((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)));
+                int j = 0; // index to delete
+                for (int k = 1; k < newpoints.Count; k++)
                 {
                     x2 = newpoints[k].X;
                     y2 = newpoints[k].Y;
                     double newdist = Math.Sqrt(((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)));
-                    if ( newdist < jdist){
+                    if (newdist < jdist)
+                    {
                         j = k;
                         jdist = newdist;
                     }
@@ -248,7 +258,7 @@ namespace OLS
 
             try
             {
-                for (int i = 0; i < dataGridView1.Rows.Count-1; i++)
+                for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
                 {
                     x = Convert.ToDouble(dataGridView1[0, i].Value);
                     y = Convert.ToDouble(dataGridView1[1, i].Value);
@@ -273,6 +283,7 @@ namespace OLS
         {
             chart1.Series["LineSeries1"].Points.Clear();
             chart1.Series["LineSeries2"].Points.Clear();
+            chart1.Series["LineSeries3"].Points.Clear();
             if (lab1)
             {
                 lsm2.FillTheMatrix2(newpoints);
@@ -294,25 +305,68 @@ namespace OLS
             }
             else
             {
-                List<double> xValues = newpoints.Select(obj => obj.X).ToList();
-                List<double> yValues = newpoints.Select(obj => obj.Y).ToList();
-                if (LSM2checkBox.Checked)//PL
+                if (lab2)
                 {
-                    for (double i = newpoints[0].X; i <= newpoints[newpoints.Count-1].X; i++)
+                    List<double> xValues = newpoints.Select(obj => obj.X).ToList();
+                    List<double> yValues = newpoints.Select(obj => obj.Y).ToList();
+                    if (LSM2checkBox.Checked)//PL
                     {
-                        chart1.Series["LineSeries1"].Points.AddXY(i, lab2cl.GetYPL(i,xValues,yValues));
+                        for (double i = newpoints[0].X; i <= newpoints[newpoints.Count - 1].X; i += 0.001)
+                        {
+                            chart1.Series["LineSeries1"].Points.AddXY(i, lab2cl.GetYPL(i, xValues, yValues));
+                        }
+                    }
+                    if (LSM3checkBox.Checked)//Lagrange
+                    {
+                        for (double i = newpoints[0].X; i <= newpoints[newpoints.Count - 1].X; i += 0.001)
+                        {
+                            chart1.Series["LineSeries2"].Points.AddXY(i, lab2cl.InterpolateLagrangePolynomial(i, xValues, yValues, xValues.Count));
+                        }
                     }
                 }
-                if (LSM3checkBox.Checked)//Lagrange
+                else
                 {
-                    for (double i = newpoints[0].X; i <= newpoints[newpoints.Count-1].X; i++)
+                    if (lab3)
                     {
-                        chart1.Series["LineSeries2"].Points.AddXY(i, lab2cl.InterpolateLagrangePolynomial(i, xValues, yValues, xValues.Count));
+
+                        //chart1.Series["LineSeries1"].Name = "Gauss";
+                        //chart1.Series["LineSeries2"].Name = "GaussParam";
+                        //chart1.Series["LineSeries3"].Name = "GaussSum";
+                        GaussCalc();
+                        if (GaussCheckBox.Checked)
+                        {
+                            for(int i = 0;i< gauss.G.Count(); i++)
+                            {
+                                //chart1.Series["Gauss"].Name = "LineSeries1";
+                                chart1.Series["LineSeries1"].Points.AddXY(gauss.X[i],gauss.G[i]);
+                                //chart1.Series["LineSeries1"].Name = "Gauss";
+                            }
+                        }
+                        if (GaussParCheckBox.Checked)
+                        {
+                            for (int i = 0; i < gauss.G_param.Count(); i++)
+                            {
+                                //chart1.Series["GaussParam"].Name = "LineSeries2";
+                                chart1.Series["LineSeries2"].Points.AddXY(gauss.X_param[i], gauss.G_param[i]);
+                                //chart1.Series["LineSeries2"].Name = "GaussParam";
+                            }
+                        }
+                        if (GaussSumCheckBox.Checked)
+                        {
+                            for (int i = 0; i < gauss.G_sum.Count(); i++)
+                            {
+                                //chart1.Series["GaussSum"].Name = "LineSeries3";
+                                chart1.Series["LineSeries3"].Points.AddXY(gauss.X_sum[i], gauss.G_sum[i]);
+                                //chart1.Series["LineSeries3"].Name = "GaussSum";
+                            }
+                        }
+                    }
+                    else
+                    {
+
                     }
                 }
             }
-            
-
         }
 
         private void ClearButton_Click(object sender, EventArgs e)
@@ -363,7 +417,7 @@ namespace OLS
         private void GetYButton_Click(object sender, EventArgs e)
         {
             string YText = "";
-            if(XTextBox.Text != "")
+            if (XTextBox.Text != "")
             {
                 double x = Convert.ToDouble(XTextBox.Text);
                 YText = "For x = " + XTextBox.Text + "\n";
@@ -399,6 +453,52 @@ namespace OLS
                         }
                     }
                 }
+                else
+                {
+                    if (x < gauss.X[0] || x > gauss.X[gauss.X.Count() - 1])
+                    {
+                        MessageBox.Show("Wrong X Value");
+                    }
+                    else
+                    {
+                        double y=0;
+
+                        if (GaussCheckBox.Checked)
+                        {
+                            for (int i = 0; i < gauss.G.Count(); i++)
+                            {
+                                if(x == gauss.X[i])
+                                {
+                                    y = gauss.G[i];
+                                }
+                            }
+                            YText += "Gauss y value = " + y + "\n";
+                        }
+                        if (GaussParCheckBox.Checked)
+                        {
+                            for (int i = 0; i < gauss.G_param.Count(); i++)
+                            {
+                                if (x == gauss.X_param[i])
+                                {
+                                    y = gauss.G_param[i];
+                                }
+                            }
+                            YText += "Gauss Param y value = " + y + "\n";
+                        }
+                        if (GaussSumCheckBox.Checked)
+                        {
+                            for (int i = 0; i < gauss.G_sum.Count(); i++)
+                            {
+                                if (x == gauss.X_sum[i])
+                                {
+                                    y = gauss.G_sum[i];
+                                }
+                            }
+                            YText += "Gauss Sum y value = " + y + "\n";
+                        }
+                    }
+                    
+                }
                 MessageBox.Show(YText);
             }
             else
@@ -418,7 +518,7 @@ namespace OLS
             {
                 if (Drawing)
                 {
-                    DrawButton_Click(this,new EventArgs());
+                    DrawButton_Click(this, new EventArgs());
                 }
                 Deleting = true;
                 DeletePointButton.Text = "Stop Deleting";
@@ -445,18 +545,32 @@ namespace OLS
                 {
                     if (LSM2checkBox.Checked)
                     {
-                        text += "Coefficients for LSM2 are:\nC0 = "  + "\nC1 = "  + "\n";
+                        text += "Coefficients for LSM2 are:\nC0 = " + "\nC1 = " + "\n";
                     }
                     if (LSM3checkBox.Checked)
                     {
-                        text += "Coefficients for LSM3 are:\nC0 = "  + "\nC1 = "  + "\nC2 = " + lsm3.C2;
+                        text += "Coefficients for LSM3 are:\nC0 = " + "\nC1 = " + "\nC2 = " + lsm3.C2;
                     }
                 }
                 MessageBox.Show(text);
-            }catch(Exception er)
+            }
+            catch (Exception er)
             {
                 MessageBox.Show(er.Message);
             }
+        }
+
+        private void GaussCalc()
+        {
+            gauss.size = dataGridView1.Rows.Count - 1;
+            gauss.x_values_enter = new double[gauss.size];
+            gauss.y_values_enter = new double[gauss.size];
+            for (int i = 0; i < gauss.size; i++)
+            {
+                gauss.x_values_enter[i] = Double.Parse(dataGridView1.Rows[i].Cells[0].Value.ToString());
+                gauss.y_values_enter[i] = Double.Parse(dataGridView1.Rows[i].Cells[1].Value.ToString());
+            }
+            gauss.Count();
         }
     }
 
